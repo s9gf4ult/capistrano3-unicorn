@@ -11,6 +11,15 @@ namespace :load do
 end
 
 namespace :unicorn do
+  desc "Create pid directory"
+  task :create_pid_dir do
+    on roles(fetch(:unicorn_roles)) do
+      unless File.exists?(pid_dir)
+        FileUtils.mkdir_p(pid_dir)
+      end
+    end
+  end
+
   desc "Start Unicorn"
   task :start do
     on roles(fetch(:unicorn_roles)) do
@@ -90,10 +99,16 @@ namespace :unicorn do
       end
     end
   end
+
+  before 'unicorn:start', 'unicorn:create_pid_dir'
 end
 
 def pid
   "`cat #{fetch(:unicorn_pid)}`"
+end
+
+def pid_dir
+  File.dirname(fetch(:unicorn_pid))
 end
 
 def pid_oldbin
