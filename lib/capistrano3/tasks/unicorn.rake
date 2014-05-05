@@ -14,8 +14,8 @@ namespace :unicorn do
   desc "Create pid directory"
   task :create_pid_dir do
     on roles(fetch(:unicorn_roles)) do
-      unless File.exists?(pid_dir)
-        FileUtils.mkdir_p(pid_dir)
+      within current_path do
+        execute "[ -d '#{pid_dir}' ] || mkdir -p '#{pid_dir}'"
       end
     end
   end
